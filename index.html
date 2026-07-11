@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-CAD生成相关工作" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" class="article-date">
+  <time class="dt-published" datetime="2026-07-11T14:04:33.000Z" itemprop="datePublished">2026-07-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CAD-E/">CAD/E</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/">CAD生成相关工作</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>目前主要分为两类 <strong>模拟人建模的工作流（Sketch-Extrude）</strong> 和<strong>直接生成（Direct Generation）</strong><br>前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…<br>后一种：UV-Net BrepGen NeuroNURBS DTGBrepGen Hola AutoCAD BRepGPT BRT…</p>
+<h3 id="AutoBRep："><a href="#AutoBRep：" class="headerlink" title="AutoBRep："></a>AutoBRep：</h3><h4 id="几何表征"><a href="#几何表征" class="headerlink" title="几何表征"></a>几何表征</h4><p>对面和边用采点，然后用类似BRepGen的方法做深度压缩 再用有限标量量化，得到面和边的几何信息。然后和面、边的包围盒信息接起来，[C,G]得到面和边的全部几何表征信息。</p>
+<h4 id="拓扑表征"><a href="#拓扑表征" class="headerlink" title="拓扑表征"></a>拓扑表征</h4><p>使用广度优先来遍历BRep图。<br><img src="/images/19.png" alt="AutoBRep 拓扑的BFT表示方式 最后将CAD表征为一个可以用Transformer自回归生成的序列"><br>F E是上面表征好的面 边几何信息<br>这里Tx 是一个局部拓扑标记。这篇文章关注局部拓扑，因为对于广度优先搜索，每个新的面只会和同层或上一层的面有边连接（否则如果和前面的有边连接，那就已经出现在前面了。）<br>所以这里T是一个局部对面的标记 随着层级变化而滑动 T只记录上一层和当前层的面。<br>比如说第l-1层有三个面，分别记为T0 T1 T2 那么到第l层 如果想要表达和上一层面的连接关系 就可以写 Fx Tx Ex这样。比如第l层有2个面 那么就是T3 T4。到了第l+1层，第l-1层的面没有用了，那么窗口就滑动了，第l层两个面分别变成了T0 T1 第l+1层的再往下标记。这样就表示了局部拓扑。<br>（当然显而易见的问题：如果有2层的面很多，那么就会爆掉T的最大设定值。）</p>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>先做<strong>无条件预训练</strong>，用GPT-style的方法，用上面的方式表征BRep 从第一个面开始不断预测下一个token。<br>然后再做<strong>针对Autocomplete的训练</strong>，也就是对于一个生成了一半的CAD模型，把它补全。<br>此时将已经建模好的那些面都作为第一层级的内容，作为模型输入，然后去往后预测。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cmrgg4qmd0003pgrr44u58csq" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-CAX工作流简述" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" class="article-date">
+  <time class="dt-published" datetime="2026-07-10T13:16:19.000Z" itemprop="datePublished">2026-07-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CAD-E/">CAD/E</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/">CAX工作流/前沿方法简述</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><em>by大卡米</em><br>oooooooo</p>
+<h3 id="0-最传统制造业工作流"><a href="#0-最传统制造业工作流" class="headerlink" title="0.最传统制造业工作流"></a>0.最传统制造业工作流</h3><p><strong>设计-&gt;制造-&gt;测试</strong><br>工程师凭经验手绘画图纸  照着图纸制造  测试产品是否符合要求<br>问题：（显然一堆）<br>设计阶段：图纸难画难修改 很依赖工程师经验 复杂模型难以绘制 没有统一标准，有可能信息误解……<br>制造阶段：依赖工人操作机器 工艺操作依赖人工经验<br>测试阶段：如果测试发现产品不合格，就要全部把上面的流程打回重做，大量浪费时间人力物力。</p>
+<h3 id="1-CAX基本工作流-如何帮助解决上面这些问题"><a href="#1-CAX基本工作流-如何帮助解决上面这些问题" class="headerlink" title="1.CAX基本工作流 如何帮助解决上面这些问题"></a>1.CAX基本工作流 如何帮助解决上面这些问题</h3><p><strong>CAD：计算机辅助设计 Computer Aided Design</strong><br><strong>CAE：计算机辅助工程 Computer Aided Engineering</strong><br><strong>CAM：计算机辅助制造 ComputerAided Manufacture</strong><br>（CAD&#x2F;CAE&#x2F;CAM都属于工业软件的<strong>研发设计类</strong>软件。工业软件本身的概念更大，还包括生产制造、企业经营管理等类软件。研发设计类软件是<strong>我国目前的薄弱点、发展重难点</strong>）<br><img src="/images/1.png" alt="研发设计类软件是我国当前发展重难点"></p>
+<p>工作流：<br>(1) 工程师根据设计想法 预期产品 使用CAD建模软件建模 形成<strong>CAD模型（BRep）</strong><br>（使用软件进行设计、调节参数等，更便利、易修改、能设计复杂模型、有统一标准）<br><img src="/images/2.png" alt="在FreeCAD软件中展示的一个CAD模型，同时可以看到软件上方有大量的建模工具可以用来建模"></p>
+<p>(2) CAD模型剖分离散化为<strong>网格</strong>（CAE前处理）<br>网格分为<strong>四面体网格</strong>和<strong>六面体网格</strong>。四面体每个面都是三角形，所以对于二维就是三角形填充，又叫非结构化网格。六面体每个面都是四边形，所以对于二维就是四边形填充，又叫结构化网格。<br><img src="/images/3.png" alt="一个四面体网格模型。大卡米也做过一点网格相关的任务，当时的图"><br><img src="/images/4.png" alt="一个六面体网格，六面体网格的质量高于四面体网格，但是生成难度更高"></p>
+<p>（3）使用CAE软件对离散网格进行<strong>有限元分析</strong> 赋予实际物理条件 如材料特性 载荷（约束）初始&#x2F;边界条件 然后在节点上做仿真求解 可以生成仿真云图<br>（有限元：现实世界物理量是连续的，但是计算机不能处理无限的连续的东西，所以要进行<strong>离散化</strong>处理。比如一个连续的CAD模型被离散化成有限个网格，网格就是一种有限元。有限元分析就是在这些有限的离散化实体上做分析。有限元分析是一种近似做法，必然有精度损失，精度与网格划分质量相关。<br><img src="/images/11.png" alt="国内知名CAE企业英特仿真的自研软件，可以看到对物理模型的一系列相关设定"><br><img src="/images/5.png" alt="在英特仿真软件中进行仿真后得到的一个仿真云图"></p>
+<p>（4）根据仿真结果进行<strong>结构优化</strong>，修改CAD设计，让算法自动在设计域内调整材料分布、修改几何尺寸等等。<br>结构优化主要分为尺寸优化、形状优化、拓扑优化等。依次自由度上升。<br>结构优化顺序一般是先拓扑再形状再尺寸（先固定大的结构，再进行小的调整）<br>拓扑：连接关系。材料的连接关系，直观理解就是有几个洞。<br>举例：有一个材料，先确定有几个洞（拓扑优化），再确定洞的形状（形状优化），最后确定洞的大小（尺寸优化）<br><img src="/images/12.png" alt="三种优化的简单举例"></p>
+<p>（5）最后根据优化好的最终CAD设计控制机器进行实际制造（将CAD模型转换为控制机器制造的指令的软件就是CAM）</p>
+<p>问题：<br>很多步骤还是依赖人工操作，速度慢，成本高。<br>比如CAD模型的生成过程，依旧是比较依靠工程师自己的设计经验，费时费力。<br>网格剖分过程也要依靠大量人工手动操作。（尤其是六面体网格）<br>CAE仿真过程也要根据人工经验设定现实物理约束等等。<br>CAE仿真计算过程一般开销非常大，耗时。这部分是核心重难点之一。</p>
+<h3 id="2-哪些环节可以进一步优化？"><a href="#2-哪些环节可以进一步优化？" class="headerlink" title="2.哪些环节可以进一步优化？"></a>2.哪些环节可以进一步优化？</h3><h4 id="回顾整个过程："><a href="#回顾整个过程：" class="headerlink" title="回顾整个过程："></a>回顾整个过程：</h4><h5 id="首先要有个CAD"><a href="#首先要有个CAD" class="headerlink" title="首先要有个CAD"></a>首先要有个CAD</h5><h5 id="然后要把CAD离散化成网格"><a href="#然后要把CAD离散化成网格" class="headerlink" title="然后要把CAD离散化成网格"></a>然后要把CAD离散化成网格</h5><h5 id="然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化"><a href="#然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化" class="headerlink" title="然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化"></a>然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化</h5><h4 id="（1）首先要有个CAD-生成CAD的过程"><a href="#（1）首先要有个CAD-生成CAD的过程" class="headerlink" title="（1）首先要有个CAD-生成CAD的过程"></a>（1）首先要有个CAD-生成CAD的过程</h4><p>传统做法是依赖人工建模，但是现在也有了一些自动化方法。</p>
+<p>比如输入离散点云（通过三维扫描等获得，比如医疗上 CT机），然后可以通过程序化算法自动进行表面参数化拟合，得到CAD模型。<br>（参数化拟合：简单来说，寻找一个将三维空间映射到二维空间的函数。比如现在有很多三维的点，我们希望找到一个二维的参数化曲面，试着去拟合这些离散的三维点。）<br>但是这种方法对输入的质量有较高要求，如果输入的点云比较脏 噪声多 那么容易出错 或者生成的CAD模型也很不干净，有大量碎面之类的 还是要人工介入修补。不鲁棒。</p>
+<p>新兴方法：基于AI 深度学习。输入可以非常多样化，比如可以是点云 图像 甚至自然语言。深度学习是数据驱动而非规则驱动 更鲁棒。<br>这个算是很新兴很前沿的领域，基本就是几年之内，近几年有大量的这类工作，各有各的长处和问题。<br><img src="/images/6.png" alt="一篇做深度学习驱动生成CAD的文章。可以看到支持多种类型的输入"><br><img src="/images/7.png" alt="一篇博客，总结了前沿的AI驱动CAD生成的工作。可以看到前沿工作基本都是这两年的，很新"></p>
+<p>更前沿的新型方法：Agent4CAD 用Agent去调用建模操作API，模拟人建模的全过程。好处是建模出的CAD一定是水密的，因为都是用建模操作做出来的（基于深度学习生成的CAD会有不水密的情况）。但是生成模型的范围可能会局限于有限的建模操作。<br><img src="/images/17.png" alt="一个近年的基于操作流的CAD生成工作，但是仅限于草图+拉伸（sketch）操作"></p>
+<h4 id="（2）然后要把CAD离散化成网格-从CAD生成网格。"><a href="#（2）然后要把CAD离散化成网格-从CAD生成网格。" class="headerlink" title="（2）然后要把CAD离散化成网格-从CAD生成网格。"></a>（2）然后要把CAD离散化成网格-从CAD生成网格。</h4><p>前面说过，体网格有四面体网格和六面体网格。（当然面网格就是三角形和四边形了）<br>从后续分析来说 六面体网格比四面体网格更好，计算精度更高、速度更快‌。</p>
+<p>但是。六面体网格<strong>难生成</strong>。<br>四面体网格现在已经有相对成熟的自动化生成方法（如<em>Delaunay三角剖分法</em>）。<br>虽然它容易生成数量非常庞大的四面体网格造成后续分析开销很大，虽然它在一些角落&#x2F;缝隙容易出现质量很差的狭长网格影响计算精度，但是它确实能自动化生成。<br>而六面体网格的自动生成，难度很大，现有方法基本都还有较大局限性。</p>
+<p>现在常用的两种六面体网格自动生成方法是映射法（Mapping）和扫掠法（Sweeping），都是针对一些特定、简单模型的生成方法。<br><img src="/images/8.png" alt="映射法与扫掠法"><br>还有诸多其他试着解决复杂模型六面体网格自动生成问题的方法。但截至目前所有方法都存在着很大的局限性，在实际生产中无法直接应用。<br><img src="/images/13.png" alt="英特仿真的商软，可见四面体自动生成支持大多数几何体，六面体自动生成只支持特定类型的“规则集合体”，也就是可mapping的几何体。这侧面说明了这是当前唯一基本可靠的六面体自动生成方法"></p>
+<h4 id="（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径"><a href="#（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径" class="headerlink" title="（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径"></a>（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径</h4><p>我们的最终目标就是得在送去仿真之前，弄出一个<strong>离散化网格</strong>么。<br>因此，达到这个目标就行了，不一定非得从CAD模型过来。</p>
+<ul>
+<li><p>比如从点云直接生成网格。<br><img src="/images/9.png" alt="泊松重建法，从有向点云直接到网格"></p>
+</li>
+<li><p>比如近些年新兴的AI深度学习-神经隐式场法来生成网格。（前沿，基本上几年之内）<br><strong>隐式场：</strong>传统的点云、网格等，称为<em>显式场</em>，直接记录“模型在哪，长什么样子”。比如直接给点坐标，每个点在哪，法向是什么等。<br>但是这种需要记录非常多东西，比如点云，要存很多点，那就是硬存每个点的三维坐标。对精细程度要求越高，点越多，空间开销越大。并且无论多少点，归根到底都还是离散的。<br>而<em>隐式场</em>就是，定义一个<strong>神经网络</strong>，输入一个点坐标，可以输出这个点到底是在模型内部还是外部、距离模型表面多远等属性。也就是不直接定义“模型在哪”，而是通过这些属性隐式表达。<br>类比<em>显函数</em>和<em>隐函数</em>，y&#x3D;3x+1，x^2+y^2&#x3D;1。一个直接告诉“y怎么表达”，一个不直接告诉y的表达，但是在定义域内任意给定一个x，都能求出对应的y。<br>隐式场表达法的一大好处在空间开销小，只需要存一个神经网络的参数（一般只有数个MB量级）。另一个好处在于神经网络是一个连续的函数。</p>
+</li>
+</ul>
+<p>最早的隐式场网络是一个简单的分类概率场，称为<strong>占用场（Occupancy Field）</strong>。<br>输入一个点坐标，输出这个坐标在模型内部还是外部，也就是这个点是否被模型“占用”。<br><strong>F(x,y,z) &#x3D; p</strong></p>
+<p>后来发展出一种常用的隐式场网络叫做<strong>带符号距离函数（Signed Distance Function,SDF）</strong>。<br>输入一个点坐标，输出这个坐标到模型表面的距离。内部为负，外部为正。<br><strong>F(x,y,z) &#x3D; d</strong><br>（并且隐式场的好处就体现出来了，因为隐式场的神经网络内部本质上是很多连续可导的函数（y&#x3D;wx+b），因此这个SDF是可导的，可以直接求每个方向的梯度。）<br><img src="/images/18.png" alt="这里展示了一个二维的SDF"></p>
+<p>另外一种常见的隐式场是<strong>神经辐射场（Neural Radiance Field,NeRF）</strong>。<br>输入一个点的坐标，和从这个点向外辐射的一条线的方向，输出从这个方向看这个点的颜色和透明度。<br><strong>F(x,y,z,d) &#x3D; (R,G,B,σ)</strong><br>容易想到这个主要是用于渲染的，而不是用于网格生成。因为网格生成用不到颜色等等这些纹理信息。</p>
+<p>在得到一个好的隐式场网络之后，就可以直接通过<strong>Marching Cube法</strong>得到网格。Marching Cube法是一种基于规则的方法，基本是准确的。因此难点就转化为了如何得到一个良好的隐式场网络。</p>
+<p>最容易想到的简单方法显然是直接拿一个模型的信息去训练，直接用监督学习的方法，输入为模型内部的很多点坐标，标签为这一点的SDF值。但是这样训练出的结果显然毫无泛化性，每个模型的情况都不一样，训练出的网络就只对这一个模型有用，那对每个模型都要训练一个多层MLP，效率过低，没有实用价值。</p>
+<p>所以有一种做法是，我们训练一个<strong>编码器</strong>，这个编码器的功能是对于点云&#x2F;图片等输入进行一个统一化编码，这个编码可以表征输入模型的特征。然后我们把编码得到的特征和要查询的点坐标一起，扔到多层MLP里面去预测分类概率&#x2F;SDF等等。这样，对于每个不同的模型，我们就给了一个个性化的输入特征，提高了泛化性。<br>（这个路线最早的方法的编码特征是一个简单的特征向量，但是有诸多问题，后来还有一系列优化方案，甚至最近还有走基于大模型路线的，纯数据派，拿巨量数据去堆出泛化性。我目前也没有专业研究这个方向，不详述了）</p>
+<p>Marching Cube法的一个小问题：虽然Marching Cube法基于规则，在准确度上有保证，但是想得到越高精度的网格就要把小Cube分的越细，开销会变大。有一个小trick是八叉树层级结构优化。</p>
+<ul>
+<li>比如基于高斯泼溅法的网格生成<br>近几年比较火的一个工作是<strong>3D高斯泼溅</strong>，这项工作本身不是用于网格生成的，其原始目标是输入有限数量的照片，也就是一个物体的不同角度，可以输出这个物理的连续各个视角的画面。（比如只从8个方向拍摄一个物体，能重建出全部角度的连续画面。）<br>其原始目标只是视觉上“看起来”保真，可能是用于游戏实时渲染等等，但是不追求物理上保真，不适合网格生成。<br>高斯点简单来说就是一种类似点云的东西，但是点云是严格固定坐标的，就在那固定一个点。但高斯点就是想想一个多元高斯分布，是一个区域，点中间是“最浓厚”的地方，但是周围也会有。<br><img src="/images/14.png"><br><img src="/images/15.png" alt="同一个物体，使用点云和三维高斯点来展示。可以看到高斯点更“模糊”，使用高斯点可以“看起来更真实”"></li>
+</ul>
+<p>在这个基础上出现的一个改进做法是<strong>2D高斯泼溅</strong>，这个相当于在3D基础上加了正则化约束，让它物理上保真，然后可以用于网格生成任务。<br>3D高斯泼溅是在3维空间做一个高斯分布，类似一个球。2D高斯泼溅则是在2维空间做一个高斯分布，一个圆盘。因此2D高斯泼溅更能表达精确的表面几何，能用于网格生成。<br><img src="/images/16.png" alt="3D和2D高斯泼溅"></p>
+<p><em>如果继续降维，最后到0维高斯泼溅，那就变回点云了，哈哈哈</em></p>
+<h4 id="（4）CAE仿真部分"><a href="#（4）CAE仿真部分" class="headerlink" title="（4）CAE仿真部分"></a>（4）CAE仿真部分</h4><p>这部分我不是很懂。有一些方法基于底层数值算法来优化求解器的求解效率。<br>近年还有一些工作试着结合深度学习+CAE，目标是输入CAD和条件，直接输出仿真结果，来跳过仿真计算的瓶颈。<br>（不过CAE对仿真结果的精度要求应该较高，因为CAE的目的本身就是进行仿真，模拟实际状况，但深度学习是基于数据驱动的，从规则驱动转向数据驱动，在提高鲁棒性的同时本身一定会损失一点精度。因此个人观点是这个方向要走到能实际落地，还有比较长的距离。）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" data-id="cmrgg4qm70000pgrrcaaqg3ha" data-title="CAX工作流/前沿方法简述" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-第一篇文章" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/" class="article-date">
+  <time class="dt-published" datetime="2026-07-09T15:14:18.000Z" itemprop="datePublished">2026-07-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/">自我介绍</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/">大卡米自我介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="oooooooo"><a href="#oooooooo" class="headerlink" title="oooooooo"></a>oooooooo</h1><h3 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h3><ul>
+<li>姓名：<strong>任家暄</strong></li>
+<li>昵称：<strong>大卡米（Cammy）</strong></li>
+<li>院系：软件学院、国际信息与软件学院</li>
+<li>专业：软件工程</li>
+<li>年级：2024级</li>
+<li>籍贯：辽宁大连</li>
+<li>政治面貌：共青团员</li>
+</ul>
+<h3 id="学习成绩"><a href="#学习成绩" class="headerlink" title="学习成绩"></a>学习成绩</h3><ul>
+<li>必修课一考成绩排名约5%</li>
+<li>英语六级560分，CSP300分</li>
+</ul>
+<h3 id="获奖经历"><a href="#获奖经历" class="headerlink" title="获奖经历"></a>获奖经历</h3><ul>
+<li>奖学金：国家奖学金、优秀大学生、校二等奖学金等</li>
+<li>科创竞赛：蓝桥杯全国决赛三等、东三省数模省二等、XCPC辽宁省赛省二等</li>
+</ul>
+<h3 id="科研项目"><a href="#科研项目" class="headerlink" title="科研项目"></a>科研项目</h3><ul>
+<li><strong>深度学习+CAD&#x2F;网格生成</strong>方向</li>
+<li>作为主要参与者 研究<strong>基于深度学习的多方向可扫掠体分割</strong>项目（后续用于六面体网格生成）</li>
+</ul>
+<h3 id="社会工作"><a href="#社会工作" class="headerlink" title="社会工作"></a>社会工作</h3><ul>
+<li>软2405班学习委员</li>
+<li>软院帮帮群管理员</li>
+<li>开源组织“开源互助联盟”创建者之一</li>
+<li>寝室长</li>
+</ul>
+<h3 id="性格爱好"><a href="#性格爱好" class="headerlink" title="性格爱好"></a>性格爱好</h3><ul>
+<li>MBTI：<strong>ENFJ-A</strong></li>
+<li>和好朋友唠嗑、出去玩</li>
+<li>看文游、做点同人文、同人曲</li>
+<li>听歌</li>
+<li>看新闻</li>
+<li>稍微玩点星露谷什么的</li>
+</ul>
+<h3 id="联系方式"><a href="#联系方式" class="headerlink" title="联系方式"></a>联系方式</h3><ul>
+<li>QQ：1298140174</li>
+<li>邮箱：<a href="mailto:&#99;&#x61;&#109;&#109;&#121;&#64;&#x6d;&#x61;&#105;&#x6c;&#46;&#100;&#x6c;&#x75;&#116;&#46;&#101;&#x64;&#117;&#x2e;&#99;&#x6e;">&#99;&#x61;&#109;&#109;&#121;&#64;&#x6d;&#x61;&#105;&#x6c;&#46;&#100;&#x6c;&#x75;&#116;&#46;&#101;&#x64;&#117;&#x2e;&#99;&#x6e;</a></li>
+</ul>
+<h5 id="这是-小卡米"><a href="#这是-小卡米" class="headerlink" title="这是 小卡米"></a>这是 小卡米</h5><h4 id="这是-中卡米"><a href="#这是-中卡米" class="headerlink" title="这是 中卡米"></a>这是 中卡米</h4><h3 id="这是-大卡米"><a href="#这是-大卡米" class="headerlink" title="这是 大卡米"></a>这是 大卡米</h3><h2 id="这是-巨大卡米"><a href="#这是-巨大卡米" class="headerlink" title="这是 巨大卡米"></a>这是 巨大卡米</h2><h3 id="这是-普通大卡米"><a href="#这是-普通大卡米" class="headerlink" title="这是 普通大卡米"></a>这是 普通大卡米</h3><h3 id="这是-斜体大卡米"><a href="#这是-斜体大卡米" class="headerlink" title="这是 斜体大卡米"></a>这是 <em>斜体大卡米</em></h3><h3 id="这是-加粗大卡米"><a href="#这是-加粗大卡米" class="headerlink" title="这是 加粗大卡米"></a>这是 <strong>加粗大卡米</strong></h3><p>oooooooo</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/" data-id="cmrgg4qme0005pgrrhz04bq71" data-title="大卡米自我介绍" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/07/09/hello-world/" class="article-date">
+  <time class="dt-published" datetime="2026-07-09T12:20:34.839Z" itemprop="datePublished">2026-07-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/07/09/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/07/09/hello-world/" data-id="cmrgg4qmd0004pgrrbl0z1kqh" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CAD-E/">CAD/E</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/">自我介绍</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/07/">July 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/">CAD生成相关工作</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/">CAX工作流/前沿方法简述</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/">大卡米自我介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/09/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

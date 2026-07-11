@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>CAD生成相关工作 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="目前主要分为两类 模拟人建模的工作流（Sketch-Extrude） 和直接生成（Direct Generation）前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…后一种：UV-Net Brep">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAD生成相关工作">
+<meta property="og:url" content="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="目前主要分为两类 模拟人建模的工作流（Sketch-Extrude） 和直接生成（Direct Generation）前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…后一种：UV-Net Brep">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/19.png">
+<meta property="article:published_time" content="2026-07-11T14:04:33.000Z">
+<meta property="article:modified_time" content="2026-07-11T14:07:47.558Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/19.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-CAD生成相关工作" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" class="article-date">
+  <time class="dt-published" datetime="2026-07-11T14:04:33.000Z" itemprop="datePublished">2026-07-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CAD-E/">CAD/E</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      CAD生成相关工作
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>目前主要分为两类 <strong>模拟人建模的工作流（Sketch-Extrude）</strong> 和<strong>直接生成（Direct Generation）</strong><br>前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…<br>后一种：UV-Net BrepGen NeuroNURBS DTGBrepGen Hola AutoCAD BRepGPT BRT…</p>
+<h3 id="AutoBRep："><a href="#AutoBRep：" class="headerlink" title="AutoBRep："></a>AutoBRep：</h3><h4 id="几何表征"><a href="#几何表征" class="headerlink" title="几何表征"></a>几何表征</h4><p>对面和边用采点，然后用类似BRepGen的方法做深度压缩 再用有限标量量化，得到面和边的几何信息。然后和面、边的包围盒信息接起来，[C,G]得到面和边的全部几何表征信息。</p>
+<h4 id="拓扑表征"><a href="#拓扑表征" class="headerlink" title="拓扑表征"></a>拓扑表征</h4><p>使用广度优先来遍历BRep图。<br><img src="/images/19.png" alt="AutoBRep 拓扑的BFT表示方式 最后将CAD表征为一个可以用Transformer自回归生成的序列"><br>F E是上面表征好的面 边几何信息<br>这里Tx 是一个局部拓扑标记。这篇文章关注局部拓扑，因为对于广度优先搜索，每个新的面只会和同层或上一层的面有边连接（否则如果和前面的有边连接，那就已经出现在前面了。）<br>所以这里T是一个局部对面的标记 随着层级变化而滑动 T只记录上一层和当前层的面。<br>比如说第l-1层有三个面，分别记为T0 T1 T2 那么到第l层 如果想要表达和上一层面的连接关系 就可以写 Fx Tx Ex这样。比如第l层有2个面 那么就是T3 T4。到了第l+1层，第l-1层的面没有用了，那么窗口就滑动了，第l层两个面分别变成了T0 T1 第l+1层的再往下标记。这样就表示了局部拓扑。<br>（当然显而易见的问题：如果有2层的面很多，那么就会爆掉T的最大设定值。）</p>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>先做<strong>无条件预训练</strong>，用GPT-style的方法，用上面的方式表征BRep 从第一个面开始不断预测下一个token。<br>然后再做<strong>针对Autocomplete的训练</strong>，也就是对于一个生成了一半的CAD模型，把它补全。<br>此时将已经建模好的那些面都作为第一层级的内容，作为模型输入，然后去往后预测。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cmrgg4qmd0003pgrr44u58csq" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">CAX工作流/前沿方法简述</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CAD-E/">CAD/E</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/">自我介绍</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/07/">July 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/">CAD生成相关工作</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/">CAX工作流/前沿方法简述</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/">大卡米自我介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2026/07/09/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
