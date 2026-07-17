@@ -105,7 +105,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cmrgg4qmd0003pgrr44u58csq" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cmronbv5p0000ecrr41029t6x" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -154,8 +154,7 @@
 <p>问题：<br>很多步骤还是依赖人工操作，速度慢，成本高。<br>比如CAD模型的生成过程，依旧是比较依靠工程师自己的设计经验，费时费力。<br>网格剖分过程也要依靠大量人工手动操作。（尤其是六面体网格）<br>CAE仿真过程也要根据人工经验设定现实物理约束等等。<br>CAE仿真计算过程一般开销非常大，耗时。这部分是核心重难点之一。</p>
 <h3 id="2-哪些环节可以进一步优化？"><a href="#2-哪些环节可以进一步优化？" class="headerlink" title="2.哪些环节可以进一步优化？"></a>2.哪些环节可以进一步优化？</h3><h4 id="回顾整个过程："><a href="#回顾整个过程：" class="headerlink" title="回顾整个过程："></a>回顾整个过程：</h4><h5 id="首先要有个CAD"><a href="#首先要有个CAD" class="headerlink" title="首先要有个CAD"></a>首先要有个CAD</h5><h5 id="然后要把CAD离散化成网格"><a href="#然后要把CAD离散化成网格" class="headerlink" title="然后要把CAD离散化成网格"></a>然后要把CAD离散化成网格</h5><h5 id="然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化"><a href="#然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化" class="headerlink" title="然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化"></a>然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化</h5><h4 id="（1）首先要有个CAD-生成CAD的过程"><a href="#（1）首先要有个CAD-生成CAD的过程" class="headerlink" title="（1）首先要有个CAD-生成CAD的过程"></a>（1）首先要有个CAD-生成CAD的过程</h4><p>传统做法是依赖人工建模，但是现在也有了一些自动化方法。</p>
 <p>比如输入离散点云（通过三维扫描等获得，比如医疗上 CT机），然后可以通过程序化算法自动进行表面参数化拟合，得到CAD模型。<br>（参数化拟合：简单来说，寻找一个将三维空间映射到二维空间的函数。比如现在有很多三维的点，我们希望找到一个二维的参数化曲面，试着去拟合这些离散的三维点。）<br>但是这种方法对输入的质量有较高要求，如果输入的点云比较脏 噪声多 那么容易出错 或者生成的CAD模型也很不干净，有大量碎面之类的 还是要人工介入修补。不鲁棒。</p>
-<p>新兴方法：基于AI 深度学习。输入可以非常多样化，比如可以是点云 图像 甚至自然语言。深度学习是数据驱动而非规则驱动 更鲁棒。<br>这个算是很新兴很前沿的领域，基本就是几年之内，近几年有大量的这类工作，各有各的长处和问题。<br><img src="/images/6.png" alt="一篇做深度学习驱动生成CAD的文章。可以看到支持多种类型的输入"><br><img src="/images/7.png" alt="一篇博客，总结了前沿的AI驱动CAD生成的工作。可以看到前沿工作基本都是这两年的，很新"></p>
-<p>更前沿的新型方法：Agent4CAD 用Agent去调用建模操作API，模拟人建模的全过程。好处是建模出的CAD一定是水密的，因为都是用建模操作做出来的（基于深度学习生成的CAD会有不水密的情况）。但是生成模型的范围可能会局限于有限的建模操作。<br><img src="/images/17.png" alt="一个近年的基于操作流的CAD生成工作，但是仅限于草图+拉伸（sketch）操作"></p>
+<p>新兴方法：基于AI 深度学习。输入可以非常多样化，比如可以是点云 图像 甚至自然语言。也有无条件生成。深度学习是数据驱动而非规则驱动 更鲁棒。<br>这个算是很新兴很前沿的领域，基本就是几年之内，近几年有大量的这类工作，各有各的长处和问题。<br>目前的主要流派分为两种：<br>一种是通过生成操作序列，间接生成BRep。这种的优势是生成的CAD保证是valid的，因为是在学习人类建模的操作序列。但是局限于有限的建模操作种类，主要还是草图+拉伸，也有工作能做旋转，但是有些操作还是有难度，比如倒角、圆角等，在生成复杂面也有难度。领域内第一篇是DeepCAD(2021).<br>另一种是直接通过生成CAD的primitives和拓扑连接信息，直接而生成CAD。这种的优势是可以生成更Free的面，但是不保证valid，可能出现比如不水密、自相交等问题。领域内第一篇是SolidGen(2022)<br><img src="/images/6.png" alt="一篇做深度学习驱动（直接生成）生成CAD的文章。可以看到支持多种类型的输入"><br><img src="/images/7.png" alt="一篇博客，总结了前沿的AI驱动CAD生成的工作。可以看到前沿工作基本都是这两年的，很新"><br><img src="/images/17.png" alt="一个基于操作流的CAD生成工作，但是仅限于草图+拉伸（sketch）操作"></p>
 <h4 id="（2）然后要把CAD离散化成网格-从CAD生成网格。"><a href="#（2）然后要把CAD离散化成网格-从CAD生成网格。" class="headerlink" title="（2）然后要把CAD离散化成网格-从CAD生成网格。"></a>（2）然后要把CAD离散化成网格-从CAD生成网格。</h4><p>前面说过，体网格有四面体网格和六面体网格。（当然面网格就是三角形和四边形了）<br>从后续分析来说 六面体网格比四面体网格更好，计算精度更高、速度更快‌。</p>
 <p>但是。六面体网格<strong>难生成</strong>。<br>四面体网格现在已经有相对成熟的自动化生成方法（如<em>Delaunay三角剖分法</em>）。<br>虽然它容易生成数量非常庞大的四面体网格造成后续分析开销很大，虽然它在一些角落&#x2F;缝隙容易出现质量很差的狭长网格影响计算精度，但是它确实能自动化生成。<br>而六面体网格的自动生成，难度很大，现有方法基本都还有较大局限性。</p>
 <p>现在常用的两种六面体网格自动生成方法是映射法（Mapping）和扫掠法（Sweeping），都是针对一些特定、简单模型的生成方法。<br><img src="/images/8.png" alt="映射法与扫掠法"><br>还有诸多其他试着解决复杂模型六面体网格自动生成问题的方法。但截至目前所有方法都存在着很大的局限性，在实际生产中无法直接应用。<br><img src="/images/13.png" alt="英特仿真的商软，可见四面体自动生成支持大多数几何体，六面体自动生成只支持特定类型的“规则集合体”，也就是可mapping的几何体。这侧面说明了这是当前唯一基本可靠的六面体自动生成方法"></p>
@@ -183,7 +182,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" data-id="cmrgg4qm70000pgrrcaaqg3ha" data-title="CAX工作流/前沿方法简述" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" data-id="cmronbv5s0001ecrrfcqzcd6l" data-title="CAX工作流/前沿方法简述" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -195,9 +194,9 @@
 
 
   
-    <article id="post-第一篇文章" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-卡米自我介绍" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/" class="article-date">
+    <a href="/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" class="article-date">
   <time class="dt-published" datetime="2026-07-09T15:14:18.000Z" itemprop="datePublished">2026-07-09</time>
 </a>
     
@@ -213,7 +212,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/">大卡米自我介绍</a>
+      <a class="p-name article-title" href="/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/">大卡米自我介绍</a>
     </h1>
   
 
@@ -258,14 +257,14 @@
 </ul>
 <h3 id="联系方式"><a href="#联系方式" class="headerlink" title="联系方式"></a>联系方式</h3><ul>
 <li>QQ：1298140174</li>
-<li>邮箱：<a href="mailto:&#99;&#x61;&#109;&#109;&#121;&#64;&#x6d;&#x61;&#105;&#x6c;&#46;&#100;&#x6c;&#x75;&#116;&#46;&#101;&#x64;&#117;&#x2e;&#99;&#x6e;">&#99;&#x61;&#109;&#109;&#121;&#64;&#x6d;&#x61;&#105;&#x6c;&#46;&#100;&#x6c;&#x75;&#116;&#46;&#101;&#x64;&#117;&#x2e;&#99;&#x6e;</a></li>
+<li>邮箱：<a href="mailto:&#99;&#97;&#109;&#109;&#x79;&#64;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x64;&#x6c;&#x75;&#116;&#x2e;&#x65;&#100;&#117;&#x2e;&#99;&#x6e;">&#99;&#97;&#109;&#109;&#x79;&#64;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x64;&#x6c;&#x75;&#116;&#x2e;&#x65;&#100;&#117;&#x2e;&#99;&#x6e;</a></li>
 </ul>
 <h5 id="这是-小卡米"><a href="#这是-小卡米" class="headerlink" title="这是 小卡米"></a>这是 小卡米</h5><h4 id="这是-中卡米"><a href="#这是-中卡米" class="headerlink" title="这是 中卡米"></a>这是 中卡米</h4><h3 id="这是-大卡米"><a href="#这是-大卡米" class="headerlink" title="这是 大卡米"></a>这是 大卡米</h3><h2 id="这是-巨大卡米"><a href="#这是-巨大卡米" class="headerlink" title="这是 巨大卡米"></a>这是 巨大卡米</h2><h3 id="这是-普通大卡米"><a href="#这是-普通大卡米" class="headerlink" title="这是 普通大卡米"></a>这是 普通大卡米</h3><h3 id="这是-斜体大卡米"><a href="#这是-斜体大卡米" class="headerlink" title="这是 斜体大卡米"></a>这是 <em>斜体大卡米</em></h3><h3 id="这是-加粗大卡米"><a href="#这是-加粗大卡米" class="headerlink" title="这是 加粗大卡米"></a>这是 <strong>加粗大卡米</strong></h3><p>oooooooo</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/" data-id="cmrgg4qme0005pgrrhz04bq71" data-title="大卡米自我介绍" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" data-id="cmronbv5v0004ecrrajn7bl9s" data-title="大卡米自我介绍" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -316,7 +315,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/09/hello-world/" data-id="cmrgg4qmd0004pgrrbl0z1kqh" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/09/hello-world/" data-id="cmronbv5u0003ecrr6iccheum" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -374,7 +373,7 @@
           </li>
         
           <li>
-            <a href="/2026/07/09/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/">大卡米自我介绍</a>
+            <a href="/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/">大卡米自我介绍</a>
           </li>
         
           <li>
