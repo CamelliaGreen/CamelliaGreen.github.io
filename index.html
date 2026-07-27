@@ -31,7 +31,119 @@
   
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
 
-<meta name="generator" content="Hexo 7.3.0"></head>
+<meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
 <body>
   <div id="container">
@@ -97,15 +209,37 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>目前主要分为两类 <strong>模拟人建模的工作流（Sketch-Extrude）</strong> 和<strong>直接生成（Direct Generation）</strong><br>前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…<br>后一种：UV-Net BrepGen NeuroNURBS DTGBrepGen Hola AutoCAD BRepGPT BRT…</p>
-<h3 id="AutoBRep："><a href="#AutoBRep：" class="headerlink" title="AutoBRep："></a>AutoBRep：</h3><h4 id="几何表征"><a href="#几何表征" class="headerlink" title="几何表征"></a>几何表征</h4><p>对面和边用采点，然后用类似BRepGen的方法做深度压缩 再用有限标量量化，得到面和边的几何信息。然后和面、边的包围盒信息接起来，[C,G]得到面和边的全部几何表征信息。</p>
+        <p>目前主要分为两类 <strong>模拟人建模的工作流（Sketch-Extrude）</strong> 和<strong>直接生成（Direct Generation）</strong><br>前一种：DeepCAD SkexGen HNC-CAD CADTrans Text2CAD image-to-CAD  voxel-to-CAD SECAD-Net FlexCAD Fusion 360 Gallery CADSIGNet RLCAD…<br>后一种：SolidGen UV-Net BrepGen NeuroNURBS DTGBrepGen Hola AutoBRep BRepGPT BRT…</p>
+<p>直接生成目前主要就是两种网络基本架构：扩散模型 or 自回归模型</p>
+<ul>
+<li><h2 id="AutoBRep-2025-："><a href="#AutoBRep-2025-：" class="headerlink" title="AutoBRep(2025)："></a>AutoBRep(2025)：</h2><h4 id="几何表征"><a href="#几何表征" class="headerlink" title="几何表征"></a>几何表征</h4>对面和边用采点，然后用类似BRepGen的方法做深度压缩 再用有限标量量化，得到面和边的几何信息。然后和面、边的包围盒信息接起来，[C,G]得到面和边的全部几何表征信息。</li>
+</ul>
 <h4 id="拓扑表征"><a href="#拓扑表征" class="headerlink" title="拓扑表征"></a>拓扑表征</h4><p>使用广度优先来遍历BRep图。<br><img src="/images/19.png" alt="AutoBRep 拓扑的BFT表示方式 最后将CAD表征为一个可以用Transformer自回归生成的序列"><br>F E是上面表征好的面 边几何信息<br>这里Tx 是一个局部拓扑标记。这篇文章关注局部拓扑，因为对于广度优先搜索，每个新的面只会和同层或上一层的面有边连接（否则如果和前面的有边连接，那就已经出现在前面了。）<br>所以这里T是一个局部对面的标记 随着层级变化而滑动 T只记录上一层和当前层的面。<br>比如说第l-1层有三个面，分别记为T0 T1 T2 那么到第l层 如果想要表达和上一层面的连接关系 就可以写 Fx Tx Ex这样。比如第l层有2个面 那么就是T3 T4。到了第l+1层，第l-1层的面没有用了，那么窗口就滑动了，第l层两个面分别变成了T0 T1 第l+1层的再往下标记。这样就表示了局部拓扑。<br>（当然显而易见的问题：如果有2层的面很多，那么就会爆掉T的最大设定值。）</p>
 <h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>先做<strong>无条件预训练</strong>，用GPT-style的方法，用上面的方式表征BRep 从第一个面开始不断预测下一个token。<br>然后再做<strong>针对Autocomplete的训练</strong>，也就是对于一个生成了一半的CAD模型，把它补全。<br>此时将已经建模好的那些面都作为第一层级的内容，作为模型输入，然后去往后预测。</p>
+<ul>
+<li><h2 id="BRepGen（2024）："><a href="#BRepGen（2024）：" class="headerlink" title="BRepGen（2024）："></a>BRepGen（2024）：</h2><h4 id="几何表征-1"><a href="#几何表征-1" class="headerlink" title="几何表征"></a>几何表征</h4>在面和边上采点，使用VAE压缩。一个面Fz为4<em>4</em>3，一个边Ez为4*3.<br>再加上包围盒信息，Fp=[x1,y1,z1,x2,y2,z2]，F=[Fp,Fz]。<br>E同理，但是E还多拼接上一个端顶点的坐标，Ezv<mjx-container class="MathJax" jax="SVG" overflow="overflow"><svg style="vertical-align: -0.097ex;" xmlns="http://www.w3.org/2000/svg" width="8.487ex" height="2.002ex" role="img" focusable="false" viewBox="0 -841.7 3751.1 884.7"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math" data-latex="∈{{R}^{4*3+6}}"><g data-mml-node="mo" data-latex="∈"><path data-c="2208" d="M563 4L373 4C310 4 254 25 208 68C162 111 136 163 130 226L563 226C579 226 587 234 587 250C587 266 579 274 563 274L130 274C136 337 162 389 208 432C254 475 310 496 373 496L563 496C579 496 587 504 587 519C587 535 579 543 563 543L373 543C292 543 223 515 166 458C109 401 81 332 81 250C81 168 109 99 166 42C223-15 292-43 373-43L563-43C579-43 587-35 587-19C587-7 576 4 563 4Z"></path></g><g data-mml-node="TeXAtom" data-latex="{{R}^{4*3+6}}" data-mjx-texclass="ORD" transform="translate(944.8,0)"><g data-mml-node="msup" data-latex="{R}^{4*3+6}"><g data-mml-node="TeXAtom" data-latex="{R}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="R"><path data-c="1D445" d="M739 531C739 582 713 621 662 649C621 672 572 683 517 683L235 683C212 683 202 682 202 659C202 652 205 647 211 646C221 645 229 644 234 644C264 643 281 641 286 640C291 639 294 636 294 631C294 629 293 623 290 613L158 82C153 60 143 46 128 41C121 39 103 38 72 38C50 38 41 37 41 15C41 4 47-1 59 0L183 3L309 0C325-1 333 8 333 23C333 33 322 38 301 38C261 38 241 43 241 52C241 52 242 54 244 68L308 327L423 327C492 327 527 298 527 241C527 232 522 210 513 174C502 132 497 104 497 89C497 13 556-22 632-22C660-22 687-9 714 16C741 41 755 68 755 96C755 106 750 111 739 111C732 111 726 106 723 95C712 64 698 41 682 28C666 15 651 8 636 8C613 8 601 27 601 64C601 88 604 125 611 176C614 197 615 212 615 223C615 276 587 315 531 339C625 362 739 429 739 531M609 616C629 603 639 581 639 550C639 530 635 507 626 480C599 398 531 357 422 357L316 357L379 610C384 631 392 642 403 643C408 644 428 644 463 644C528 644 566 642 609 616Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(792,363) scale(0.707)" data-latex="{4*3+6}" data-mjx-texclass="ORD"><g data-mml-node="mn" data-latex="4"><path data-c="34" d="M353 677C344 677 336 672 330 663L28 199L28 163L289 163L289 81C289 63 285 51 278 46C271 41 252 39 219 39L194 39L194 0C223 2 269 3 331 3C393 3 439 2 468 0L468 39L443 39C410 39 391 41 384 46C377 51 373 63 373 81L373 163L471 163L471 202L373 202L373 660C373 670 366 677 353 677M295 553L295 202L67 202Z"></path></g><g data-mml-node="mo" data-latex="*" transform="translate(500,0)"><path data-c="2217" d="M404 372C397 372 390 370 385 366L267 279L282 425C285 445 269 462 250 462C231 462 215 445 218 425L233 279L115 366C110 370 103 372 96 372C78 372 63 357 63 339C63 325 70 315 83 309L217 250L83 191C70 185 63 175 63 161C63 143 78 128 96 128C103 128 110 130 115 134L233 221L218 75C215 55 231 39 250 39C269 39 285 55 282 75L267 221L385 134C390 130 397 128 404 128C415 128 424 133 431 142C446 162 435 183 417 191L283 250L417 309C430 315 437 325 437 339C437 357 422 372 404 372Z"></path></g><g data-mml-node="mn" data-latex="3" transform="translate(1000,0)"><path data-c="33" d="M303 353C369 378 431 441 431 526C431 569 410 604 369 631C333 654 292 666 246 666C201 666 162 654 127 631C88 605 68 571 68 528C68 495 90 472 122 472C154 472 176 495 176 527C176 560 157 578 119 580C145 615 186 633 242 633C302 633 332 598 332 527C332 485 324 450 309 421C282 373 245 364 183 364C171 362 165 357 165 348C165 333 172 333 192 333L235 333C310 333 348 280 348 173C348 88 317 14 241 14C176 14 128 36 99 80C134 79 160 105 160 139C160 173 135 198 101 198C62 198 42 178 42 137C42 88 64 49 108 18C147-9 193-22 244-22C301-22 350-3 393 34C436 71 457 117 457 173C457 267 383 332 303 353Z"></path></g><g data-mml-node="mo" data-latex="+" transform="translate(1500,0)"><path data-c="2B" d="M698 274L413 274L413 559C413 575 405 583 389 583C373 583 365 575 365 559L365 274L80 274C64 274 56 266 56 250C56 234 64 226 80 226L365 226L365-59C365-75 373-83 389-83C405-83 413-75 413-59L413 226L698 226C714 226 722 234 722 250C722 263 711 274 698 274Z"></path></g><g data-mml-node="mn" data-latex="6" transform="translate(2278,0)"><path data-c="36" d="M383 504C416 504 432 521 432 555C432 627 378 666 304 666C221 666 155 627 106 548C63 480 42 403 42 316C42 189 65 100 112 47C152 1 198-22 251-22C312-22 362 1 401 47C438 91 457 144 457 205C457 266 439 318 403 361C365 407 316 431 257 431C205 431 165 402 138 346L138 352C138 465 166 561 226 605C252 624 279 633 306 633C342 633 368 623 385 602C351 602 334 583 334 553C334 525 355 504 383 504M344 340C355 317 361 272 361 206C361 141 356 98 345 76C325 35 294 14 251 14C222 14 200 24 184 44C171 60 162 74 158 85C146 116 140 163 140 227C140 255 144 282 151 308C164 355 201 399 256 399C295 399 325 379 344 340Z"></path></g></g></g></g></g></g></svg></mjx-container> ，然后再和包围盒拼接，E=[Ep,Ezv]。</li>
+</ul>
+<h4 id="拓扑表征-1"><a href="#拓扑表征-1" class="headerlink" title="拓扑表征"></a>拓扑表征</h4><p>这篇文章采用<strong>树结构</strong>表示拓扑，上面的表征（面/边）就是一个结点的信息。<br><img src="/images/20.png" alt="树状拓扑结构"><br><strong>Mating Duplication</strong>：使用结点复制来表示公用边，也就是如果两个面公用一条边，那么它们就有一个相同特征的孩子节点。用这种方式来表示拓扑关系。<br><strong>Association Duplication</strong>：起到Padding的作用，为了做统一表示，在同一层级复制已有结点。</p>
+<h4 id="BRep生成"><a href="#BRep生成" class="headerlink" title="BRep生成"></a>BRep生成</h4><p>采用<strong>DDPM（去噪扩散概率模型）</strong>来做BRep的生成。先加噪，再让模型学习逐步去噪。<br>这里采用了逐步生成，分别地训练了4个模型（standard transformer）。<br><img src="/images/21.png" alt="网络整体架构"><br><img src="/images/22.png" alt=""><br>第一个模型：无条件输入，输入<mjx-container class="MathJax" jax="SVG" overflow="overflow"><svg style="vertical-align: -0.869ex;" xmlns="http://www.w3.org/2000/svg" width="2.59ex" height="2.692ex" role="img" focusable="false" viewBox="0 -805.6 1144.7 1189.8"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math" data-latex="{{F}_{p}^{t}}"><g data-mml-node="TeXAtom" data-latex="{{F}_{p}^{t}}" data-mjx-texclass="ORD"><g data-mml-node="msubsup" data-latex="{F}_{p}^{t}"><g data-mml-node="TeXAtom" data-latex="{F}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="F"><path data-c="1D439" d="M199 656C199 646 210 641 231 641C271 641 291 637 291 628C291 625 289 618 286 605L156 82C150 60 140 47 126 42C119 40 101 39 70 39C48 39 38 37 38 16C38 5 44 0 57 0L187 3L335 0C351 0 359 8 359 23C359 40 348 39 322 39C278 39 253 41 247 46C244 47 243 51 243 56L307 321L400 321C446 321 478 319 478 281C478 268 476 252 471 233C470 230 469 226 468 222C468 211 473 206 484 206C489 207 496 214 503 229L557 444C559 452 560 458 560 461C557 470 551 475 544 475C536 475 530 467 526 452C516 414 502 390 486 378C470 366 442 360 402 360L317 360L379 606C387 640 387 641 429 641L559 641C656 641 700 626 700 537C700 517 699 499 697 484C696 473 695 467 695 466C695 455 700 450 710 450C720 450 726 459 728 478L748 649C751 677 744 680 717 680L233 680C210 680 199 679 199 656Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(839.4,363) scale(0.707)" data-latex="{t}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="t"><path data-c="1D461" d="M330 419C330 428 320 433 299 433L218 433C244 537 257 591 257 595C257 616 246 626 225 626C202 626 188 613 182 587L145 433L56 433C34 433 23 432 23 411C23 400 33 395 54 395L135 395C86 200 62 97 62 84C62 28 100-11 156-11C194-11 227 6 256 41C280 70 297 98 308 125C312 136 314 142 314 145C314 154 309 159 299 159C291 159 285 154 281 143C247 60 206 19 157 19C140 19 131 33 131 60C131 75 133 91 137 107L208 395L297 395C323 395 330 397 330 419Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(676,-247) scale(0.707)" data-latex="{p}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="p"><path data-c="1D45D" d="M355 442C311 442 269 419 228 373C217 419 186 442 137 442C96 442 66 409 45 344C35 311 30 292 30 286C30 277 35 272 46 272C51 272 54 273 57 275C62 284 65 291 66 298C84 374 107 412 134 412C152 412 161 398 161 371C161 356 159 339 154 321L44-118C35-151 34-155-5-155C-23-155-32-163-32-178C-32-189-26-194-15-194C0-194 52-191 67-191C86-191 146-194 165-194C180-194 187-186 187-170C187-160 178-155 159-155C141-155 114-156 114-144C114-131 155 26 159 43C179 6 209-13 249-13C314-13 371 20 421 87C467 148 490 213 490 280C490 367 438 442 355 442M352 412C391 412 411 382 411 323C411 296 405 260 394 215C371 128 342 71 307 42C286 25 267 16 248 16C219 16 199 29 188 56C179 77 174 92 174 100L225 309C230 331 248 354 276 377C304 400 329 412 352 412Z"></path></g></g></g></g></g></g></svg></mjx-container>（即t步加噪后的Fp信息）和时间步t，输出Fp（面的包围盒信息）<br>第二个模型：条件输入Fp，输入<mjx-container class="MathJax" jax="SVG" overflow="overflow"><svg style="vertical-align: -0.576ex;" xmlns="http://www.w3.org/2000/svg" width="2.59ex" height="2.399ex" role="img" focusable="false" viewBox="0 -805.6 1144.7 1060.4"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math" data-latex="{{F}_{z}^{t}}"><g data-mml-node="TeXAtom" data-latex="{{F}_{z}^{t}}" data-mjx-texclass="ORD"><g data-mml-node="msubsup" data-latex="{F}_{z}^{t}"><g data-mml-node="TeXAtom" data-latex="{F}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="F"><path data-c="1D439" d="M199 656C199 646 210 641 231 641C271 641 291 637 291 628C291 625 289 618 286 605L156 82C150 60 140 47 126 42C119 40 101 39 70 39C48 39 38 37 38 16C38 5 44 0 57 0L187 3L335 0C351 0 359 8 359 23C359 40 348 39 322 39C278 39 253 41 247 46C244 47 243 51 243 56L307 321L400 321C446 321 478 319 478 281C478 268 476 252 471 233C470 230 469 226 468 222C468 211 473 206 484 206C489 207 496 214 503 229L557 444C559 452 560 458 560 461C557 470 551 475 544 475C536 475 530 467 526 452C516 414 502 390 486 378C470 366 442 360 402 360L317 360L379 606C387 640 387 641 429 641L559 641C656 641 700 626 700 537C700 517 699 499 697 484C696 473 695 467 695 466C695 455 700 450 710 450C720 450 726 459 728 478L748 649C751 677 744 680 717 680L233 680C210 680 199 679 199 656Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(839.4,363) scale(0.707)" data-latex="{t}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="t"><path data-c="1D461" d="M330 419C330 428 320 433 299 433L218 433C244 537 257 591 257 595C257 616 246 626 225 626C202 626 188 613 182 587L145 433L56 433C34 433 23 432 23 411C23 400 33 395 54 395L135 395C86 200 62 97 62 84C62 28 100-11 156-11C194-11 227 6 256 41C280 70 297 98 308 125C312 136 314 142 314 145C314 154 309 159 299 159C291 159 285 154 281 143C247 60 206 19 157 19C140 19 131 33 131 60C131 75 133 91 137 107L208 395L297 395C323 395 330 397 330 419Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(676,-247) scale(0.707)" data-latex="{z}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="z"><path data-c="1D467" d="M162 92L145 90C193 137 230 171 255 194L351 283C374 304 398 330 421 359C452 397 467 420 467 428C467 437 462 442 452 442C445 442 439 438 434 429C409 388 386 368 364 368C342 368 326 386 317 398C293 427 269 442 246 442C220 442 193 430 165 404C137 378 123 352 123 326C123 316 128 311 139 311C146 311 152 316 156 325C167 354 194 368 235 368C249 368 269 363 296 354C320 345 343 340 364 339C308 284 265 244 234 217L145 134C130 119 111 99 90 74C59 35 43 12 43 3C43-6 48-11 59-11C65-11 71-6 78 4C103 43 130 63 158 63C174 63 192 51 212 26C232 1 255-11 278-11C312-11 346 7 382 42C418 77 436 111 436 144C436 153 431 158 420 158C413 158 407 153 402 143C387 100 344 63 288 63C264 63 186 92 162 92Z"></path></g></g></g></g></g></g></svg></mjx-container>、t，输出Fz（面的几何编码信息）<br>第三个模型：条件输入F（即Fp和Fz），输入<mjx-container class="MathJax" jax="SVG" overflow="overflow"><svg style="vertical-align: -0.869ex;" xmlns="http://www.w3.org/2000/svg" width="2.662ex" height="2.692ex" role="img" focusable="false" viewBox="0 -805.6 1176.7 1189.8"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math" data-latex="{{E}_{p}^{t}}"><g data-mml-node="TeXAtom" data-latex="{{E}_{p}^{t}}" data-mjx-texclass="ORD"><g data-mml-node="msubsup" data-latex="{E}_{p}^{t}"><g data-mml-node="TeXAtom" data-latex="{E}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="E"><path data-c="1D438" d="M199 656C199 646 210 641 231 641C271 641 291 637 291 628C291 625 289 618 286 605L156 82C151 60 141 47 126 42C119 40 101 39 70 39C48 39 38 37 38 16C38 5 49 0 70 0L583 0C607 0 609 2 617 19L657 109C684 171 703 217 714 248C712 257 709 263 698 263C691 263 685 258 681 249C656 190 632 145 608 113C568 59 509 39 415 39L270 39C260 39 253 39 249 40C243 40 240 42 240 45C240 47 242 54 245 67L311 334L406 334C453 334 478 328 483 315C485 310 486 303 486 293C486 280 484 264 479 245C477 240 476 236 476 233C476 223 482 218 493 218C502 218 508 226 512 241L568 473C568 483 563 488 552 488C544 488 538 481 535 467C525 428 512 403 495 391C478 379 450 373 409 373L321 373L379 606C387 640 387 641 429 641L568 641C619 641 654 636 673 626C701 611 715 581 715 536C715 519 714 501 711 484C711 482 711 479 710 475L710 466C710 455 715 450 725 450C735 450 741 459 743 478L763 649C766 677 759 680 732 680L233 680C210 680 199 679 199 656Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(850.4,363) scale(0.707)" data-latex="{t}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="t"><path data-c="1D461" d="M330 419C330 428 320 433 299 433L218 433C244 537 257 591 257 595C257 616 246 626 225 626C202 626 188 613 182 587L145 433L56 433C34 433 23 432 23 411C23 400 33 395 54 395L135 395C86 200 62 97 62 84C62 28 100-11 156-11C194-11 227 6 256 41C280 70 297 98 308 125C312 136 314 142 314 145C314 154 309 159 299 159C291 159 285 154 281 143C247 60 206 19 157 19C140 19 131 33 131 60C131 75 133 91 137 107L208 395L297 395C323 395 330 397 330 419Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(771,-247) scale(0.707)" data-latex="{p}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="p"><path data-c="1D45D" d="M355 442C311 442 269 419 228 373C217 419 186 442 137 442C96 442 66 409 45 344C35 311 30 292 30 286C30 277 35 272 46 272C51 272 54 273 57 275C62 284 65 291 66 298C84 374 107 412 134 412C152 412 161 398 161 371C161 356 159 339 154 321L44-118C35-151 34-155-5-155C-23-155-32-163-32-178C-32-189-26-194-15-194C0-194 52-191 67-191C86-191 146-194 165-194C180-194 187-186 187-170C187-160 178-155 159-155C141-155 114-156 114-144C114-131 155 26 159 43C179 6 209-13 249-13C314-13 371 20 421 87C467 148 490 213 490 280C490 367 438 442 355 442M352 412C391 412 411 382 411 323C411 296 405 260 394 215C371 128 342 71 307 42C286 25 267 16 248 16C219 16 199 29 188 56C179 77 174 92 174 100L225 309C230 331 248 354 276 377C304 400 329 412 352 412Z"></path></g></g></g></g></g></g></svg></mjx-container>、t，输出Ep（边的包围盒信息）<br>(生成边的信息的时候，面的信息已经生成完了。面会给自己周围的边（自己的孩子节点）提供条件输入)<br>第四个模型：条件输入F、Ep，输入<mjx-container class="MathJax" jax="SVG" overflow="overflow"><svg style="vertical-align: -0.576ex;" xmlns="http://www.w3.org/2000/svg" width="3.38ex" height="2.399ex" role="img" focusable="false" viewBox="0 -805.6 1494.2 1060.4"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math" data-latex="{{E}_{zv}^{t}}"><g data-mml-node="TeXAtom" data-latex="{{E}_{zv}^{t}}" data-mjx-texclass="ORD"><g data-mml-node="msubsup" data-latex="{E}_{z v}^{t}"><g data-mml-node="TeXAtom" data-latex="{E}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="E"><path data-c="1D438" d="M199 656C199 646 210 641 231 641C271 641 291 637 291 628C291 625 289 618 286 605L156 82C151 60 141 47 126 42C119 40 101 39 70 39C48 39 38 37 38 16C38 5 49 0 70 0L583 0C607 0 609 2 617 19L657 109C684 171 703 217 714 248C712 257 709 263 698 263C691 263 685 258 681 249C656 190 632 145 608 113C568 59 509 39 415 39L270 39C260 39 253 39 249 40C243 40 240 42 240 45C240 47 242 54 245 67L311 334L406 334C453 334 478 328 483 315C485 310 486 303 486 293C486 280 484 264 479 245C477 240 476 236 476 233C476 223 482 218 493 218C502 218 508 226 512 241L568 473C568 483 563 488 552 488C544 488 538 481 535 467C525 428 512 403 495 391C478 379 450 373 409 373L321 373L379 606C387 640 387 641 429 641L568 641C619 641 654 636 673 626C701 611 715 581 715 536C715 519 714 501 711 484C711 482 711 479 710 475L710 466C710 455 715 450 725 450C735 450 741 459 743 478L763 649C766 677 759 680 732 680L233 680C210 680 199 679 199 656Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(850.4,363) scale(0.707)" data-latex="{t}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="t"><path data-c="1D461" d="M330 419C330 428 320 433 299 433L218 433C244 537 257 591 257 595C257 616 246 626 225 626C202 626 188 613 182 587L145 433L56 433C34 433 23 432 23 411C23 400 33 395 54 395L135 395C86 200 62 97 62 84C62 28 100-11 156-11C194-11 227 6 256 41C280 70 297 98 308 125C312 136 314 142 314 145C314 154 309 159 299 159C291 159 285 154 281 143C247 60 206 19 157 19C140 19 131 33 131 60C131 75 133 91 137 107L208 395L297 395C323 395 330 397 330 419Z"></path></g></g><g data-mml-node="TeXAtom" transform="translate(771,-247) scale(0.707)" data-latex="{z v}" data-mjx-texclass="ORD"><g data-mml-node="mi" data-latex="z"><path data-c="1D467" d="M162 92L145 90C193 137 230 171 255 194L351 283C374 304 398 330 421 359C452 397 467 420 467 428C467 437 462 442 452 442C445 442 439 438 434 429C409 388 386 368 364 368C342 368 326 386 317 398C293 427 269 442 246 442C220 442 193 430 165 404C137 378 123 352 123 326C123 316 128 311 139 311C146 311 152 316 156 325C167 354 194 368 235 368C249 368 269 363 296 354C320 345 343 340 364 339C308 284 265 244 234 217L145 134C130 119 111 99 90 74C59 35 43 12 43 3C43-6 48-11 59-11C65-11 71-6 78 4C103 43 130 63 158 63C174 63 192 51 212 26C232 1 255-11 278-11C312-11 346 7 382 42C418 77 436 111 436 144C436 153 431 158 420 158C413 158 407 153 402 143C387 100 344 63 288 63C264 63 186 92 162 92Z"></path></g><g data-mml-node="mi" data-latex="v" transform="translate(467,0)"><path data-c="1D463" d="M369 391C369 383 378 370 394 350C410 330 418 307 418 281C418 252 404 203 375 134C354 86 306 18 247 18C201 18 178 45 178 100C178 139 197 208 235 307C243 328 247 345 247 357C247 407 213 442 163 442C119 442 84 417 59 367C39 326 29 300 29 287C29 278 34 273 45 273C58 273 60 279 64 293C87 373 119 413 160 413C173 413 180 404 180 385C180 369 175 347 164 318C127 219 108 152 108 115C108 64 125 29 159 10C186-4 214-11 243-11C332-11 394 85 420 162C452 256 468 325 468 369C468 418 452 442 421 442C396 442 369 416 369 391Z"></path></g></g></g></g></g></g></svg></mjx-container>、t，输出Ezv（边的几何编码信息+端点坐标）<br><img src="/images/23.png" alt=""><br>条件输入Embedding的方式：使用d*x的Embedding矩阵W做乘法（x依条件输入向量的维度决定），得到d维的条件嵌入向量。多个条件输入在这里和输入相加。</p>
+<p>这篇文章相当于是几何和拓扑一起生成（因为在生成边的几何的时候，如果两个边结点生成出的信息是接近的，经过一个阈值判断认为相同，那么就会判定为是两个面的公用边，可以恢复出拓扑关系）。<br>作者做了消融实验，认为一起生成比两阶段生成好。</p>
+<ul>
+<li><h2 id="SolidGen（2022，直接生成Brep方法第一篇）："><a href="#SolidGen（2022，直接生成Brep方法第一篇）：" class="headerlink" title="SolidGen（2022，直接生成Brep方法第一篇）："></a>SolidGen（2022，直接生成Brep方法第一篇）：</h2></li>
+</ul>
+<ul>
+<li><h2 id="BRT（2025，创新采用贝塞尔参数控制点，连续方式表征几何。以前都是采点。）"><a href="#BRT（2025，创新采用贝塞尔参数控制点，连续方式表征几何。以前都是采点。）" class="headerlink" title="BRT（2025，创新采用贝塞尔参数控制点，连续方式表征几何。以前都是采点。）"></a>BRT（2025，创新采用贝塞尔参数控制点，连续方式表征几何。以前都是采点。）</h2></li>
+</ul>
+<ul>
+<li><h2 id="Brep2Shape（2026，清华的，做自监督预训练，结合了连续化贝塞尔方法和采点离散方法）"><a href="#Brep2Shape（2026，清华的，做自监督预训练，结合了连续化贝塞尔方法和采点离散方法）" class="headerlink" title="Brep2Shape（2026，清华的，做自监督预训练，结合了连续化贝塞尔方法和采点离散方法）"></a>Brep2Shape（2026，清华的，做自监督预训练，结合了连续化贝塞尔方法和采点离散方法）</h2></li>
+</ul>
+<ul>
+<li><h2 id="Self-supervised-representation-learning-for-cad（2023，自监督方法第一篇，Brep2Shape引它，也看一眼）"><a href="#Self-supervised-representation-learning-for-cad（2023，自监督方法第一篇，Brep2Shape引它，也看一眼）" class="headerlink" title="Self-supervised representation learning for cad（2023，自监督方法第一篇，Brep2Shape引它，也看一眼）"></a>Self-supervised representation learning for cad（2023，自监督方法第一篇，Brep2Shape引它，也看一眼）</h2></li>
+</ul>
+<p>↑看了好几篇，还没写总结呢，懒了</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cmronbv5p0000ecrr41029t6x" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/11/CAD%E7%94%9F%E6%88%90%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C/" data-id="cms2mp8vb0003u0rr7vng8c68" data-title="CAD生成相关工作" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -145,44 +279,45 @@
       
         <p><em>by大卡米</em><br>oooooooo</p>
 <h3 id="0-最传统制造业工作流"><a href="#0-最传统制造业工作流" class="headerlink" title="0.最传统制造业工作流"></a>0.最传统制造业工作流</h3><p><strong>设计-&gt;制造-&gt;测试</strong><br>工程师凭经验手绘画图纸  照着图纸制造  测试产品是否符合要求<br>问题：（显然一堆）<br>设计阶段：图纸难画难修改 很依赖工程师经验 复杂模型难以绘制 没有统一标准，有可能信息误解……<br>制造阶段：依赖工人操作机器 工艺操作依赖人工经验<br>测试阶段：如果测试发现产品不合格，就要全部把上面的流程打回重做，大量浪费时间人力物力。</p>
-<h3 id="1-CAX基本工作流-如何帮助解决上面这些问题"><a href="#1-CAX基本工作流-如何帮助解决上面这些问题" class="headerlink" title="1.CAX基本工作流 如何帮助解决上面这些问题"></a>1.CAX基本工作流 如何帮助解决上面这些问题</h3><p><strong>CAD：计算机辅助设计 Computer Aided Design</strong><br><strong>CAE：计算机辅助工程 Computer Aided Engineering</strong><br><strong>CAM：计算机辅助制造 ComputerAided Manufacture</strong><br>（CAD&#x2F;CAE&#x2F;CAM都属于工业软件的<strong>研发设计类</strong>软件。工业软件本身的概念更大，还包括生产制造、企业经营管理等类软件。研发设计类软件是<strong>我国目前的薄弱点、发展重难点</strong>）<br><img src="/images/1.png" alt="研发设计类软件是我国当前发展重难点"></p>
+<h3 id="1-CAX基本工作流-如何帮助解决上面这些问题"><a href="#1-CAX基本工作流-如何帮助解决上面这些问题" class="headerlink" title="1.CAX基本工作流 如何帮助解决上面这些问题"></a>1.CAX基本工作流 如何帮助解决上面这些问题</h3><p><strong>CAD：计算机辅助设计 Computer Aided Design</strong><br><strong>CAE：计算机辅助工程 Computer Aided Engineering</strong><br><strong>CAM：计算机辅助制造 ComputerAided Manufacture</strong><br>（CAD/CAE/CAM都属于工业软件的<strong>研发设计类</strong>软件。工业软件本身的概念更大，还包括生产制造、企业经营管理等类软件。研发设计类软件是<strong>我国目前的薄弱点、发展重难点</strong>）<br><img src="/images/1.png" alt="研发设计类软件是我国当前发展重难点"></p>
 <p>工作流：<br>(1) 工程师根据设计想法 预期产品 使用CAD建模软件建模 形成<strong>CAD模型（BRep）</strong><br>（使用软件进行设计、调节参数等，更便利、易修改、能设计复杂模型、有统一标准）<br><img src="/images/2.png" alt="在FreeCAD软件中展示的一个CAD模型，同时可以看到软件上方有大量的建模工具可以用来建模"></p>
 <p>(2) CAD模型剖分离散化为<strong>网格</strong>（CAE前处理）<br>网格分为<strong>四面体网格</strong>和<strong>六面体网格</strong>。四面体每个面都是三角形，所以对于二维就是三角形填充，又叫非结构化网格。六面体每个面都是四边形，所以对于二维就是四边形填充，又叫结构化网格。<br><img src="/images/3.png" alt="一个四面体网格模型。大卡米也做过一点网格相关的任务，当时的图"><br><img src="/images/4.png" alt="一个六面体网格，六面体网格的质量高于四面体网格，但是生成难度更高"></p>
-<p>（3）使用CAE软件对离散网格进行<strong>有限元分析</strong> 赋予实际物理条件 如材料特性 载荷（约束）初始&#x2F;边界条件 然后在节点上做仿真求解 可以生成仿真云图<br>（有限元：现实世界物理量是连续的，但是计算机不能处理无限的连续的东西，所以要进行<strong>离散化</strong>处理。比如一个连续的CAD模型被离散化成有限个网格，网格就是一种有限元。有限元分析就是在这些有限的离散化实体上做分析。有限元分析是一种近似做法，必然有精度损失，精度与网格划分质量相关。<br><img src="/images/11.png" alt="国内知名CAE企业英特仿真的自研软件，可以看到对物理模型的一系列相关设定"><br><img src="/images/5.png" alt="在英特仿真软件中进行仿真后得到的一个仿真云图"></p>
+<p>（3）使用CAE软件对离散网格进行<strong>有限元分析</strong> 赋予实际物理条件 如材料特性 载荷（约束）初始/边界条件 然后在节点上做仿真求解 可以生成仿真云图<br>（有限元：现实世界物理量是连续的，但是计算机不能处理无限的连续的东西，所以要进行<strong>离散化</strong>处理。比如一个连续的CAD模型被离散化成有限个网格，网格就是一种有限元。有限元分析就是在这些有限的离散化实体上做分析。有限元分析是一种近似做法，必然有精度损失，精度与网格划分质量相关。<br><img src="/images/11.png" alt="国内知名CAE企业英特仿真的自研软件，可以看到对物理模型的一系列相关设定"><br><img src="/images/5.png" alt="在英特仿真软件中进行仿真后得到的一个仿真云图"></p>
 <p>（4）根据仿真结果进行<strong>结构优化</strong>，修改CAD设计，让算法自动在设计域内调整材料分布、修改几何尺寸等等。<br>结构优化主要分为尺寸优化、形状优化、拓扑优化等。依次自由度上升。<br>结构优化顺序一般是先拓扑再形状再尺寸（先固定大的结构，再进行小的调整）<br>拓扑：连接关系。材料的连接关系，直观理解就是有几个洞。<br>举例：有一个材料，先确定有几个洞（拓扑优化），再确定洞的形状（形状优化），最后确定洞的大小（尺寸优化）<br><img src="/images/12.png" alt="三种优化的简单举例"></p>
 <p>（5）最后根据优化好的最终CAD设计控制机器进行实际制造（将CAD模型转换为控制机器制造的指令的软件就是CAM）</p>
 <p>问题：<br>很多步骤还是依赖人工操作，速度慢，成本高。<br>比如CAD模型的生成过程，依旧是比较依靠工程师自己的设计经验，费时费力。<br>网格剖分过程也要依靠大量人工手动操作。（尤其是六面体网格）<br>CAE仿真过程也要根据人工经验设定现实物理约束等等。<br>CAE仿真计算过程一般开销非常大，耗时。这部分是核心重难点之一。</p>
 <h3 id="2-哪些环节可以进一步优化？"><a href="#2-哪些环节可以进一步优化？" class="headerlink" title="2.哪些环节可以进一步优化？"></a>2.哪些环节可以进一步优化？</h3><h4 id="回顾整个过程："><a href="#回顾整个过程：" class="headerlink" title="回顾整个过程："></a>回顾整个过程：</h4><h5 id="首先要有个CAD"><a href="#首先要有个CAD" class="headerlink" title="首先要有个CAD"></a>首先要有个CAD</h5><h5 id="然后要把CAD离散化成网格"><a href="#然后要把CAD离散化成网格" class="headerlink" title="然后要把CAD离散化成网格"></a>然后要把CAD离散化成网格</h5><h5 id="然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化"><a href="#然后要用CAE软件对网格进行有限元分析-进行求解-得到仿真结果-可能再优化" class="headerlink" title="然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化"></a>然后要用CAE软件对网格进行有限元分析 进行求解 得到仿真结果 可能再优化</h5><h4 id="（1）首先要有个CAD-生成CAD的过程"><a href="#（1）首先要有个CAD-生成CAD的过程" class="headerlink" title="（1）首先要有个CAD-生成CAD的过程"></a>（1）首先要有个CAD-生成CAD的过程</h4><p>传统做法是依赖人工建模，但是现在也有了一些自动化方法。</p>
 <p>比如输入离散点云（通过三维扫描等获得，比如医疗上 CT机），然后可以通过程序化算法自动进行表面参数化拟合，得到CAD模型。<br>（参数化拟合：简单来说，寻找一个将三维空间映射到二维空间的函数。比如现在有很多三维的点，我们希望找到一个二维的参数化曲面，试着去拟合这些离散的三维点。）<br>但是这种方法对输入的质量有较高要求，如果输入的点云比较脏 噪声多 那么容易出错 或者生成的CAD模型也很不干净，有大量碎面之类的 还是要人工介入修补。不鲁棒。</p>
-<p>新兴方法：基于AI 深度学习。输入可以非常多样化，比如可以是点云 图像 甚至自然语言。也有无条件生成。深度学习是数据驱动而非规则驱动 更鲁棒。<br>这个算是很新兴很前沿的领域，基本就是几年之内，近几年有大量的这类工作，各有各的长处和问题。<br>目前的主要流派分为两种：<br>一种是通过生成操作序列，间接生成BRep。这种的优势是生成的CAD保证是valid的，因为是在学习人类建模的操作序列。但是局限于有限的建模操作种类，主要还是草图+拉伸，也有工作能做旋转，但是有些操作还是有难度，比如倒角、圆角等，在生成复杂面也有难度。领域内第一篇是DeepCAD(2021).<br>另一种是直接通过生成CAD的primitives和拓扑连接信息，直接而生成CAD。这种的优势是可以生成更Free的面，但是不保证valid，可能出现比如不水密、自相交等问题。领域内第一篇是SolidGen(2022)<br><img src="/images/6.png" alt="一篇做深度学习驱动（直接生成）生成CAD的文章。可以看到支持多种类型的输入"><br><img src="/images/7.png" alt="一篇博客，总结了前沿的AI驱动CAD生成的工作。可以看到前沿工作基本都是这两年的，很新"><br><img src="/images/17.png" alt="一个基于操作流的CAD生成工作，但是仅限于草图+拉伸（sketch）操作"></p>
+<p>新兴方法：基于AI 深度学习。输入可以非常多样化，比如可以是点云 图像 甚至自然语言。也有无条件生成。深度学习是数据驱动而非规则驱动 更鲁棒。<br>这个算是很新兴很前沿的领域，基本就是几年之内，近几年有大量的这类工作，各有各的长处和问题。<br>目前的主要流派分为两种：<br>一种是通过生成操作序列，间接生成BRep。这种的优势是生成的CAD保证是valid的，因为是在学习人类建模的操作序列。但是局限于有限的建模操作种类，主要还是草图+拉伸，也有工作能做旋转，但是有些操作还是有难度，比如倒角、圆角等，在生成复杂面也有难度。领域内第一篇是DeepCAD(2021).<br>另一种是直接通过生成CAD的primitives和拓扑连接信息，直接而生成CAD。这种的优势是可以生成更Free的面，但是不保证valid，可能出现比如不水密、自相交等问题。领域内第一篇是SolidGen(2022)<br><img src="/images/6.png" alt="一篇做深度学习驱动（直接生成）生成CAD的文章。可以看到支持多种类型的输入"><br><img src="/images/7.png" alt="一篇博客，总结了前沿的AI驱动CAD生成的工作。可以看到前沿工作基本都是这两年的，很新"><br><img src="/images/17.png" alt="一个基于操作流的CAD生成工作，但是仅限于草图+拉伸（sketch）操作"><br>最近我正在大量看CAD直接生成领域的文章，挺感兴趣的。目前的主要难点还是，CAD如何表征，每个文章也就是提出一个不同的表征方式。</p>
 <h4 id="（2）然后要把CAD离散化成网格-从CAD生成网格。"><a href="#（2）然后要把CAD离散化成网格-从CAD生成网格。" class="headerlink" title="（2）然后要把CAD离散化成网格-从CAD生成网格。"></a>（2）然后要把CAD离散化成网格-从CAD生成网格。</h4><p>前面说过，体网格有四面体网格和六面体网格。（当然面网格就是三角形和四边形了）<br>从后续分析来说 六面体网格比四面体网格更好，计算精度更高、速度更快‌。</p>
-<p>但是。六面体网格<strong>难生成</strong>。<br>四面体网格现在已经有相对成熟的自动化生成方法（如<em>Delaunay三角剖分法</em>）。<br>虽然它容易生成数量非常庞大的四面体网格造成后续分析开销很大，虽然它在一些角落&#x2F;缝隙容易出现质量很差的狭长网格影响计算精度，但是它确实能自动化生成。<br>而六面体网格的自动生成，难度很大，现有方法基本都还有较大局限性。</p>
+<p>但是。六面体网格<strong>难生成</strong>。<br>四面体网格现在已经有相对成熟的自动化生成方法（如<em>Delaunay三角剖分法</em>）。<br>虽然它容易生成数量非常庞大的四面体网格造成后续分析开销很大，虽然它在一些角落/缝隙容易出现质量很差的狭长网格影响计算精度，但是它确实能自动化生成。<br>而六面体网格的自动生成，难度很大，现有方法基本都还有较大局限性。</p>
 <p>现在常用的两种六面体网格自动生成方法是映射法（Mapping）和扫掠法（Sweeping），都是针对一些特定、简单模型的生成方法。<br><img src="/images/8.png" alt="映射法与扫掠法"><br>还有诸多其他试着解决复杂模型六面体网格自动生成问题的方法。但截至目前所有方法都存在着很大的局限性，在实际生产中无法直接应用。<br><img src="/images/13.png" alt="英特仿真的商软，可见四面体自动生成支持大多数几何体，六面体自动生成只支持特定类型的“规则集合体”，也就是可mapping的几何体。这侧面说明了这是当前唯一基本可靠的六面体自动生成方法"></p>
 <h4 id="（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径"><a href="#（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径" class="headerlink" title="（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径"></a>（3）网格生成一定要按这个经典路线走吗-打开思路，看看其他不同路径</h4><p>我们的最终目标就是得在送去仿真之前，弄出一个<strong>离散化网格</strong>么。<br>因此，达到这个目标就行了，不一定非得从CAD模型过来。</p>
 <ul>
 <li><p>比如从点云直接生成网格。<br><img src="/images/9.png" alt="泊松重建法，从有向点云直接到网格"></p>
 </li>
-<li><p>比如近些年新兴的AI深度学习-神经隐式场法来生成网格。（前沿，基本上几年之内）<br><strong>隐式场：</strong>传统的点云、网格等，称为<em>显式场</em>，直接记录“模型在哪，长什么样子”。比如直接给点坐标，每个点在哪，法向是什么等。<br>但是这种需要记录非常多东西，比如点云，要存很多点，那就是硬存每个点的三维坐标。对精细程度要求越高，点越多，空间开销越大。并且无论多少点，归根到底都还是离散的。<br>而<em>隐式场</em>就是，定义一个<strong>神经网络</strong>，输入一个点坐标，可以输出这个点到底是在模型内部还是外部、距离模型表面多远等属性。也就是不直接定义“模型在哪”，而是通过这些属性隐式表达。<br>类比<em>显函数</em>和<em>隐函数</em>，y&#x3D;3x+1，x^2+y^2&#x3D;1。一个直接告诉“y怎么表达”，一个不直接告诉y的表达，但是在定义域内任意给定一个x，都能求出对应的y。<br>隐式场表达法的一大好处在空间开销小，只需要存一个神经网络的参数（一般只有数个MB量级）。另一个好处在于神经网络是一个连续的函数。</p>
+<li><p>比如近些年新兴的AI深度学习-神经隐式场法来生成网格。（前沿，基本上几年之内）<br><strong>隐式场：</strong>传统的点云、网格等，称为<em>显式场</em>，直接记录“模型在哪，长什么样子”。比如直接给点坐标，每个点在哪，法向是什么等。<br>但是这种需要记录非常多东西，比如点云，要存很多点，那就是硬存每个点的三维坐标。对精细程度要求越高，点越多，空间开销越大。并且无论多少点，归根到底都还是离散的。<br>而<em>隐式场</em>就是，定义一个<strong>神经网络</strong>，输入一个点坐标，可以输出这个点到底是在模型内部还是外部、距离模型表面多远等属性。也就是不直接定义“模型在哪”，而是通过这些属性隐式表达。<br>类比<em>显函数</em>和<em>隐函数</em>，y=3x+1，x^2+y^2=1。一个直接告诉“y怎么表达”，一个不直接告诉y的表达，但是在定义域内任意给定一个x，都能求出对应的y。<br>隐式场表达法的一大好处在空间开销小，只需要存一个神经网络的参数（一般只有数个MB量级）。另一个好处在于神经网络是一个连续的函数。</p>
 </li>
 </ul>
-<p>最早的隐式场网络是一个简单的分类概率场，称为<strong>占用场（Occupancy Field）</strong>。<br>输入一个点坐标，输出这个坐标在模型内部还是外部，也就是这个点是否被模型“占用”。<br><strong>F(x,y,z) &#x3D; p</strong></p>
-<p>后来发展出一种常用的隐式场网络叫做<strong>带符号距离函数（Signed Distance Function,SDF）</strong>。<br>输入一个点坐标，输出这个坐标到模型表面的距离。内部为负，外部为正。<br><strong>F(x,y,z) &#x3D; d</strong><br>（并且隐式场的好处就体现出来了，因为隐式场的神经网络内部本质上是很多连续可导的函数（y&#x3D;wx+b），因此这个SDF是可导的，可以直接求每个方向的梯度。）<br><img src="/images/18.png" alt="这里展示了一个二维的SDF"></p>
-<p>另外一种常见的隐式场是<strong>神经辐射场（Neural Radiance Field,NeRF）</strong>。<br>输入一个点的坐标，和从这个点向外辐射的一条线的方向，输出从这个方向看这个点的颜色和透明度。<br><strong>F(x,y,z,d) &#x3D; (R,G,B,σ)</strong><br>容易想到这个主要是用于渲染的，而不是用于网格生成。因为网格生成用不到颜色等等这些纹理信息。</p>
+<p>最早的隐式场网络是一个简单的分类概率场，称为<strong>占用场（Occupancy Field）</strong>。<br>输入一个点坐标，输出这个坐标在模型内部还是外部，也就是这个点是否被模型“占用”。<br><strong>F(x,y,z) = p</strong></p>
+<p>后来发展出一种常用的隐式场网络叫做<strong>带符号距离函数（Signed Distance Function,SDF）</strong>。<br>输入一个点坐标，输出这个坐标到模型表面的距离。内部为负，外部为正。<br><strong>F(x,y,z) = d</strong><br>（并且隐式场的好处就体现出来了，因为隐式场的神经网络内部本质上是很多连续可导的函数（y=wx+b），因此这个SDF是可导的，可以直接求每个方向的梯度。）<br><img src="/images/18.png" alt="这里展示了一个二维的SDF"></p>
+<p>另外一种常见的隐式场是<strong>神经辐射场（Neural Radiance Field,NeRF）</strong>。<br>输入一个点的坐标，和从这个点向外辐射的一条线的方向，输出从这个方向看这个点的颜色和透明度。<br><strong>F(x,y,z,d) = (R,G,B,σ)</strong><br>容易想到这个主要是用于渲染的，而不是用于网格生成。因为网格生成用不到颜色等等这些纹理信息。</p>
 <p>在得到一个好的隐式场网络之后，就可以直接通过<strong>Marching Cube法</strong>得到网格。Marching Cube法是一种基于规则的方法，基本是准确的。因此难点就转化为了如何得到一个良好的隐式场网络。</p>
 <p>最容易想到的简单方法显然是直接拿一个模型的信息去训练，直接用监督学习的方法，输入为模型内部的很多点坐标，标签为这一点的SDF值。但是这样训练出的结果显然毫无泛化性，每个模型的情况都不一样，训练出的网络就只对这一个模型有用，那对每个模型都要训练一个多层MLP，效率过低，没有实用价值。</p>
-<p>所以有一种做法是，我们训练一个<strong>编码器</strong>，这个编码器的功能是对于点云&#x2F;图片等输入进行一个统一化编码，这个编码可以表征输入模型的特征。然后我们把编码得到的特征和要查询的点坐标一起，扔到多层MLP里面去预测分类概率&#x2F;SDF等等。这样，对于每个不同的模型，我们就给了一个个性化的输入特征，提高了泛化性。<br>（这个路线最早的方法的编码特征是一个简单的特征向量，但是有诸多问题，后来还有一系列优化方案，甚至最近还有走基于大模型路线的，纯数据派，拿巨量数据去堆出泛化性。我目前也没有专业研究这个方向，不详述了）</p>
+<p>所以有一种做法是，我们训练一个<strong>编码器</strong>，这个编码器的功能是对于点云/图片等输入进行一个统一化编码，这个编码可以表征输入模型的特征。然后我们把编码得到的特征和要查询的点坐标一起，扔到多层MLP里面去预测分类概率/SDF等等。这样，对于每个不同的模型，我们就给了一个个性化的输入特征，提高了泛化性。<br>（这个路线最早的方法的编码特征是一个简单的特征向量，但是有诸多问题，后来还有一系列优化方案，甚至最近还有走基于大模型路线的，纯数据派，拿巨量数据去堆出泛化性。我目前也没有专业研究这个方向，不详述了）</p>
 <p>Marching Cube法的一个小问题：虽然Marching Cube法基于规则，在准确度上有保证，但是想得到越高精度的网格就要把小Cube分的越细，开销会变大。有一个小trick是八叉树层级结构优化。</p>
+<p>最近我还想看看神经隐式场这个方向的文章来着。</p>
 <ul>
-<li>比如基于高斯泼溅法的网格生成<br>近几年比较火的一个工作是<strong>3D高斯泼溅</strong>，这项工作本身不是用于网格生成的，其原始目标是输入有限数量的照片，也就是一个物体的不同角度，可以输出这个物理的连续各个视角的画面。（比如只从8个方向拍摄一个物体，能重建出全部角度的连续画面。）<br>其原始目标只是视觉上“看起来”保真，可能是用于游戏实时渲染等等，但是不追求物理上保真，不适合网格生成。<br>高斯点简单来说就是一种类似点云的东西，但是点云是严格固定坐标的，就在那固定一个点。但高斯点就是想想一个多元高斯分布，是一个区域，点中间是“最浓厚”的地方，但是周围也会有。<br><img src="/images/14.png"><br><img src="/images/15.png" alt="同一个物体，使用点云和三维高斯点来展示。可以看到高斯点更“模糊”，使用高斯点可以“看起来更真实”"></li>
+<li>比如基于高斯泼溅法的网格生成<br>近几年比较火的一个工作是<strong>3D高斯泼溅</strong>，这项工作本身不是用于网格生成的，其原始目标是输入有限数量的照片，也就是一个物体的不同角度，可以输出这个物理的连续各个视角的画面。（比如只从8个方向拍摄一个物体，能重建出全部角度的连续画面。）<br>其原始目标只是视觉上“看起来”保真，可能是用于游戏实时渲染等等，但是不追求物理上保真，不适合网格生成。<br>高斯点简单来说就是一种类似点云的东西，但是点云是严格固定坐标的，就在那固定一个点。但高斯点就是想想一个多元高斯分布，是一个区域，点中间是“最浓厚”的地方，但是周围也会有。<br><img src="/images/14.png" alt=""><br><img src="/images/15.png" alt="同一个物体，使用点云和三维高斯点来展示。可以看到高斯点更“模糊”，使用高斯点可以“看起来更真实”"></li>
 </ul>
 <p>在这个基础上出现的一个改进做法是<strong>2D高斯泼溅</strong>，这个相当于在3D基础上加了正则化约束，让它物理上保真，然后可以用于网格生成任务。<br>3D高斯泼溅是在3维空间做一个高斯分布，类似一个球。2D高斯泼溅则是在2维空间做一个高斯分布，一个圆盘。因此2D高斯泼溅更能表达精确的表面几何，能用于网格生成。<br><img src="/images/16.png" alt="3D和2D高斯泼溅"></p>
 <p><em>如果继续降维，最后到0维高斯泼溅，那就变回点云了，哈哈哈</em></p>
-<h4 id="（4）CAE仿真部分"><a href="#（4）CAE仿真部分" class="headerlink" title="（4）CAE仿真部分"></a>（4）CAE仿真部分</h4><p>这部分我不是很懂。有一些方法基于底层数值算法来优化求解器的求解效率。<br>近年还有一些工作试着结合深度学习+CAE，目标是输入CAD和条件，直接输出仿真结果，来跳过仿真计算的瓶颈。<br>（不过CAE对仿真结果的精度要求应该较高，因为CAE的目的本身就是进行仿真，模拟实际状况，但深度学习是基于数据驱动的，从规则驱动转向数据驱动，在提高鲁棒性的同时本身一定会损失一点精度。因此个人观点是这个方向要走到能实际落地，还有比较长的距离。）</p>
+<h4 id="（4）CAE仿真部分"><a href="#（4）CAE仿真部分" class="headerlink" title="（4）CAE仿真部分"></a>（4）CAE仿真部分</h4><p>这部分我不是很懂。工业软件特色班的课会教用CAE商软做仿真，不过我目前也就是跟着做了一遍，并不算多懂。<br>有一些方法基于底层数值算法来优化求解器的求解效率。<br>近年还有一些工作试着结合深度学习+CAE，目标是输入CAD和条件，直接输出仿真结果，来跳过仿真计算的瓶颈。<br>（不过CAE对仿真结果的精度要求应该较高，因为CAE的目的本身就是进行仿真，模拟实际状况，但深度学习是基于数据驱动的，从规则驱动转向数据驱动，在提高鲁棒性的同时本身一定会损失一点精度。因此个人观点是这个方向要走到能实际落地，还有比较长的距离。）</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" data-id="cmronbv5s0001ecrrfcqzcd6l" data-title="CAX工作流/前沿方法简述" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/10/CAX%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E8%BF%B0/" data-id="cms2mp8vd0006u0rrf6lrg1su" data-title="CAX工作流/前沿方法简述" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -238,7 +373,7 @@
 <li>科创竞赛：蓝桥杯全国决赛三等、东三省数模省二等、XCPC辽宁省赛省二等</li>
 </ul>
 <h3 id="科研项目"><a href="#科研项目" class="headerlink" title="科研项目"></a>科研项目</h3><ul>
-<li><strong>深度学习+CAD&#x2F;网格生成</strong>方向</li>
+<li><strong>深度学习+CAD/网格生成</strong>方向</li>
 <li>作为主要参与者 研究<strong>基于深度学习的多方向可扫掠体分割</strong>项目（后续用于六面体网格生成）</li>
 </ul>
 <h3 id="社会工作"><a href="#社会工作" class="headerlink" title="社会工作"></a>社会工作</h3><ul>
@@ -257,14 +392,14 @@
 </ul>
 <h3 id="联系方式"><a href="#联系方式" class="headerlink" title="联系方式"></a>联系方式</h3><ul>
 <li>QQ：1298140174</li>
-<li>邮箱：<a href="mailto:&#99;&#97;&#109;&#109;&#x79;&#64;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x64;&#x6c;&#x75;&#116;&#x2e;&#x65;&#100;&#117;&#x2e;&#99;&#x6e;">&#99;&#97;&#109;&#109;&#x79;&#64;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x64;&#x6c;&#x75;&#116;&#x2e;&#x65;&#100;&#117;&#x2e;&#99;&#x6e;</a></li>
+<li>邮箱：cammy@mail.dlut.edu.cn</li>
 </ul>
 <h5 id="这是-小卡米"><a href="#这是-小卡米" class="headerlink" title="这是 小卡米"></a>这是 小卡米</h5><h4 id="这是-中卡米"><a href="#这是-中卡米" class="headerlink" title="这是 中卡米"></a>这是 中卡米</h4><h3 id="这是-大卡米"><a href="#这是-大卡米" class="headerlink" title="这是 大卡米"></a>这是 大卡米</h3><h2 id="这是-巨大卡米"><a href="#这是-巨大卡米" class="headerlink" title="这是 巨大卡米"></a>这是 巨大卡米</h2><h3 id="这是-普通大卡米"><a href="#这是-普通大卡米" class="headerlink" title="这是 普通大卡米"></a>这是 普通大卡米</h3><h3 id="这是-斜体大卡米"><a href="#这是-斜体大卡米" class="headerlink" title="这是 斜体大卡米"></a>这是 <em>斜体大卡米</em></h3><h3 id="这是-加粗大卡米"><a href="#这是-加粗大卡米" class="headerlink" title="这是 加粗大卡米"></a>这是 <strong>加粗大卡米</strong></h3><p>oooooooo</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" data-id="cmronbv5v0004ecrrajn7bl9s" data-title="大卡米自我介绍" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/09/%E5%8D%A1%E7%B1%B3%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" data-id="cms2mp8up0000u0rr2chee9dj" data-title="大卡米自我介绍" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -300,22 +435,18 @@
       
         <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
 <h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
 <h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
 <h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/07/09/hello-world/" data-id="cmronbv5u0003ecrr6iccheum" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/07/09/hello-world/" data-id="cms2mp8vc0004u0rrd6w9dxdk" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
